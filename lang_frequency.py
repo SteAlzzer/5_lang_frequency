@@ -31,11 +31,17 @@ def load_data(filepath, reg_exp_rus=False):
 
 def get_most_frequent_words(text, amount_to_show=10):
     words_counter = Counter(text)
-    digits_size = str(len(str(amount_to_show)))
-    string_to_show = '{:0' + digits_size + '}' + '| {}\t| {}'
-    for num, word in enumerate(words_counter.most_common(amount_to_show)):
-        print(string_to_show.format(num+1, word[0], word[1]))
+    data = words_counter.most_common(amount_to_show)
     del words_counter
+    return data
+
+def pretty_print(data):
+    digits_size = str(len(str(len(data))))
+    string_to_show = '{:0' + digits_size + '}' + '| {}| {}'
+    max_word_size = max([len(word[0]) for word in data])
+    for num, word in enumerate(data):
+        print(string_to_show.format(num+1, word[0].ljust(max_word_size+1), word[1]))
+
 
 
 if __name__ == '__main__':
@@ -61,7 +67,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    words_in_text = load_data(path, options.rust)
+    words_in_text = load_data(path, options.rus)
     print(u'Файл прочитан')
 
     print('{}'.format(time.time() - start_time))
@@ -70,6 +76,8 @@ if __name__ == '__main__':
         print('Джонни, у нас проблема с файлом. Так дело не пойдёт')
         exit(-1)
 
-    get_most_frequent_words(words_in_text, amount) 
+    counted_data = get_most_frequent_words(words_in_text, amount) 
 
     print('{}'.format(time.time() - start_time))
+
+    pretty_print(counted_data)
