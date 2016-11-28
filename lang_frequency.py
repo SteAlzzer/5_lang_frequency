@@ -48,7 +48,7 @@ if __name__ == '__main__':
         exit(-1)
 
     if options.amount_to_show:
-        amount = option.amount_to_show
+        amount = options.amount_to_show
     else:
         amount = 10
     start_time = time.time()
