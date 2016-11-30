@@ -5,7 +5,7 @@ from optparse import OptionParser
 
 import time #delete
 
-def load_data(filepath, reg_exp_rus=False):
+def load_data(filepath, reg_exp_rus=False, process_big_file=False):
     '''
     Функция загрузки данных из файла
     Аргументы: filepath - путь к файлу
@@ -22,7 +22,11 @@ def load_data(filepath, reg_exp_rus=False):
     else:
         reg_exp = re.compile(r'\w+')
 
-    return process_file_by_lines(filepath, reg_exp)
+    if process_big_file:
+        print(u'Читаем файл по чанкам')
+        return process_file_by_chunks(filepath, reg_exp)
+    else:
+        return process_file_by_lines(filepath, reg_exp)
 
     # PASSSS
 
@@ -38,16 +42,14 @@ def process_file_by_chunks(filepath, reg_exp):
     buffer_for_string = ''
     data = []
     for chunk in read_file_by_chunk(filepath):
-        print(chunk)
         chunk = buffer_for_string + chunk
-        print('*', chunk)
-        found_words = re.findall(reg_exp, chunk.lower())
+        found_words = reg_exp.findall(chunk.lower())
         data.extend(found_words[:-1])
-        buffer_for_string = found_words[-1]
-        print(found_words[:-1])
-        print(buffer_for_string)
-        print('----------')
-        input()
+        pos_for_buffer = chunk.rfind(found_words[-1])
+        buffer_for_string = chunk[pos_for_buffer:]
+
+    return data
+
 
 def read_file_by_chunk(filepath, chunk_size=128):
     with open(filepath, encoding='utf-8') as file_handler:
@@ -77,11 +79,12 @@ def pretty_print(data):
 
 
 if __name__ == '__main__':
-    usage = 'Usage: %prog -p path_to_text_file [-r] [-a amount_to_show]'
+    usage = 'Usage: %prog -p path_to_text_file [-r] [-b] [-a amount_to_show]'
     parser = OptionParser(usage=usage)
 
     parser.add_option('-p', '--path', action='store', type='string', help='Путь до текстового файла')
     parser.add_option('-r', '--rus', action='store_true', default=False, help='Искать только русские слова')
+    parser.add_option('-b', '--big', action='store_true', default=False, help='Чтение огромнейшего файла')
     parser.add_option('-a', '--amount_to_show', action='store', type='int', help='Количество отображаемых слов в топе')
     
     options, arguments = parser.parse_args()
@@ -102,7 +105,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    words_in_text = load_data(path, options.rus)
+    words_in_text = load_data(path, options.rus, options.big)
     print(u'Файл прочитан')
 
     print('{}'.format(time.time() - start_time))
