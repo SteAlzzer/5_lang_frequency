@@ -16,17 +16,49 @@ def load_data(filepath, reg_exp_rus=False):
     '''
     if not os.path.isfile(filepath):
         return None 
-    data = []
     
     if reg_exp_rus:
-        reg_exp = r'[А-Яа-я]+'
+        reg_exp = re.compile(r'[А-Яа-я]+')
     else:
-        reg_exp = r'\w+'
+        reg_exp = re.compile(r'\w+')
 
+    return process_file_by_lines(filepath, reg_exp)
+
+    # PASSSS
+
+
+def process_file_by_lines(filepath, reg_exp):
+    data = []
     for line in open(filepath, encoding='utf-8'):
-        data.extend(re.findall(reg_exp, line.lower().rstrip('\r\n')))
+        data.extend(reg_exp.findall(line.lower().rstrip('\r\n')))
         # data.extend(re.findall(r'\w+', line.lower().rstrip('\r\n')))
     return data
+
+def process_file_by_chunks(filepath, reg_exp):
+    buffer_for_string = ''
+    data = []
+    for chunk in read_file_by_chunk(filepath):
+        print(chunk)
+        chunk = buffer_for_string + chunk
+        print('*', chunk)
+        found_words = re.findall(reg_exp, chunk.lower())
+        data.extend(found_words[:-1])
+        buffer_for_string = found_words[-1]
+        print(found_words[:-1])
+        print(buffer_for_string)
+        print('----------')
+        input()
+
+def read_file_by_chunk(filepath, chunk_size=128):
+    with open(filepath, encoding='utf-8') as file_handler:
+        while True:
+            chunk = file_handler.read(chunk_size)
+            if not chunk:
+                break
+            yield chunk             
+
+
+
 
 
 def get_most_frequent_words(text, amount_to_show=10):
@@ -59,6 +91,9 @@ if __name__ == '__main__':
     else:
         print('Необходимо указать путь до файла')
         exit(-1)
+
+    #todo: remove
+    # process_file_by_chunks(path, reg_exp=r'\w+')
 
     if options.amount_to_show:
         amount = options.amount_to_show
