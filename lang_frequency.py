@@ -28,14 +28,11 @@ def load_data(filepath, reg_exp_rus=False, process_big_file=False):
     else:
         return process_file_by_lines(filepath, reg_exp)
 
-    # PASSSS
-
 
 def process_file_by_lines(filepath, reg_exp):
     data = []
     for line in open(filepath, encoding='utf-8'):
-        data.extend(reg_exp.findall(line.lower().rstrip('\r\n')))
-        # data.extend(re.findall(r'\w+', line.lower().rstrip('\r\n')))
+        data.extend(reg_exp.findall(line.lower()))
     return data
 
 def process_file_by_chunks(filepath, reg_exp):
@@ -51,7 +48,7 @@ def process_file_by_chunks(filepath, reg_exp):
     return data
 
 
-def read_file_by_chunk(filepath, chunk_size=128):
+def read_file_by_chunk(filepath, chunk_size=2048):
     with open(filepath, encoding='utf-8') as file_handler:
         while True:
             chunk = file_handler.read(chunk_size)
@@ -95,13 +92,31 @@ if __name__ == '__main__':
         print('Необходимо указать путь до файла')
         exit(-1)
 
-    #todo: remove
-    # process_file_by_chunks(path, reg_exp=r'\w+')
-
     if options.amount_to_show:
         amount = options.amount_to_show
     else:
         amount = 10
+
+    start_time = time.time()
+    line_reader_result = load_data(path, options.rus)
+    print(u'Файл прочитан:', time.time()-start_time)
+    line_reader_result = Counter(line_reader_result)
+    print(u'Слова подсчитаны:', time.time()-start_time)
+    chunk_reader_result = load_data(path, options.rus, process_big_file=True)
+    print(u'Файл прочитан:', time.time()-start_time)    
+    chunk_reader_result = Counter(chunk_reader_result)
+    print(u'Слова подсчитаны:', time.time()-start_time)
+    if chunk_reader_result == line_reader_result:
+        print(u'Ребята полностью совпали!!!', time.time()-start_time)
+    elif chunk_reader_result.most_common(100) == line_reader_result.most_common(100):
+        print(u'Совпали не полнотью. Но первые 100 идентичны', time.time()-start_time)
+    else:
+        print(u'Line_method', time.time()-start_time)
+        pretty_print(line_reader_result.most_common(100))
+        print(u'\n\n====\nChunk method', time.time()-start_time)
+        pretty_print(chunk_reader_result.most_common(100))
+        print(time.time()-start_time)
+    exit(-1)
 
     start_time = time.time()
 
