@@ -45,6 +45,10 @@ def process_file_by_chunks(filepath, reg_exp):
         pos_for_buffer = chunk.rfind(found_words[-1])
         buffer_for_string = chunk[pos_for_buffer:]
 
+    if buffer_for_string:
+        found_words = reg_exp.findall(buffer_for_string.lower())
+        data.extend(found_words)
+
     return data
 
 
