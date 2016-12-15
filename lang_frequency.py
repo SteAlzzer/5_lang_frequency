@@ -29,29 +29,29 @@ def load_data(filepath, reg_exp_rus=False, process_big_file=False):
 
 
 def process_file_by_lines(filepath, reg_exp):
-    data = []
+    list_of_words = []
     for line in open(filepath, encoding='utf-8'):
-        data.extend(reg_exp.findall(line.lower()))
-    return data
+        list_of_words.extend(reg_exp.findall(line.lower()))
+    return list_of_words
 
 
 def process_file_by_chunks(filepath, reg_exp):
     buffer_for_string = ''
-    data = {}
+    dict_with_words = {}
     for chunk in read_file_by_chunk(filepath):
         chunk = buffer_for_string + chunk
         found_words = reg_exp.findall(chunk.lower())
         if not found_words:
             continue
-        data = process_data(found_words[:-1], data)
+        dict_with_words = process_dict_with_words(found_words[:-1], dict_with_words)
         pos_for_buffer = chunk.rfind(found_words[-1])
         buffer_for_string = chunk[pos_for_buffer:]
 
     if buffer_for_string:
         found_words = reg_exp.findall(buffer_for_string.lower())
-        data = process_data(found_words, data)
+        dict_with_words = process_dict_with_words(found_words, dict_with_words)
 
-    return data
+    return dict_with_words
 
 
 def read_file_by_chunk(filepath, chunk_size=2048):
@@ -63,28 +63,28 @@ def read_file_by_chunk(filepath, chunk_size=2048):
             yield chunk             
 
 
-def process_data(input_words, data_list):
+def process_data(input_words, words_dict):
     for word in input_words:
-        if word in data_list:
-            data_list[word] += 1
+        if word in words_dict:
+            words_dict[word] += 1
         else:
-            data_list[word] = 1
-    return data_list
+            words_dict[word] = 1
+    return words_dict
 
 
-def get_most_frequent_words(text, amount_to_show=10):
-    words_counter = Counter(text)
-    data = words_counter.most_common(amount_to_show)
+def get_most_frequent_words(words, amount_to_show=10):
+    words_counter = Counter(words)
+    most_common_words = words_counter.most_common(amount_to_show)
     del words_counter
 
-    return data
+    return most_common_words
 
 
-def pretty_print(data):
-    digits_size = str(len(str(len(data))))
+def pretty_print(most_common_words):
+    digits_size = str(len(str(len(most_common_words))))
     string_to_show = '{:0' + digits_size + '}' + '| {}| {}'
-    max_word_size = max([len(word[0]) for word in data])
-    for num, word in enumerate(data):
+    max_word_size = max([len(word[0]) for word in most_common_words])
+    for num, word in enumerate(most_common_words):
         print(string_to_show.format(num+1, word[0].ljust(max_word_size+1), word[1]))
 
 
@@ -119,5 +119,5 @@ if __name__ == '__main__':
         print('Джонни, у нас проблема с файлом. Так дело не пойдёт')
         exit(-1)
 
-    counted_data = get_most_frequent_words(words_in_text, amount) 
-    pretty_print(counted_data)
+    most_common_words = get_most_frequent_words(words_in_text, amount) 
+    pretty_print(most_common_words)
