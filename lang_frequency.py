@@ -3,7 +3,6 @@ import re
 from collections import Counter
 from optparse import OptionParser
 
-import time #delete
 
 def load_data(filepath, reg_exp_rus=False, process_big_file=False):
     '''
@@ -35,38 +34,22 @@ def process_file_by_lines(filepath, reg_exp):
         data.extend(reg_exp.findall(line.lower()))
     return data
 
-def process_data(input_words, data_list):
-    assert type(data_list) == type({}), ValueError
-    for word in input_words:
-        if word in data_list:
-            data_list[word] += 1
-        else:
-            data_list[word] = 1
-    return data_list
 
 def process_file_by_chunks(filepath, reg_exp):
     buffer_for_string = ''
     data = {}
-    read_size_counter = 0
     for chunk in read_file_by_chunk(filepath):
-        read_size_counter += 1
-
-        if read_size_counter*2048 % (10*1024*1024) == 0:
-            print('Read size: {}'.format(read_size_counter*2048))
-
         chunk = buffer_for_string + chunk
         found_words = reg_exp.findall(chunk.lower())
         if not found_words:
             continue
         data = process_data(found_words[:-1], data)
-        # data.extend(found_words[:-1])
         pos_for_buffer = chunk.rfind(found_words[-1])
         buffer_for_string = chunk[pos_for_buffer:]
 
     if buffer_for_string:
         found_words = reg_exp.findall(buffer_for_string.lower())
         data = process_data(found_words, data)
-        # data.extend(found_words)
 
     return data
 
@@ -80,32 +63,22 @@ def read_file_by_chunk(filepath, chunk_size=2048):
             yield chunk             
 
 
-
+def process_data(input_words, data_list):
+    for word in input_words:
+        if word in data_list:
+            data_list[word] += 1
+        else:
+            data_list[word] = 1
+    return data_list
 
 
 def get_most_frequent_words(text, amount_to_show=10):
-    
     words_counter = Counter(text)
     data = words_counter.most_common(amount_to_show)
     del words_counter
-    # if type(text) == type([]):
-    #     data_list = {}
-    #     for word in text:
-    #         if word in data_list:
-    #             data_list[word] += 1
-    #         else:
-    #             data_list[word] = 1
-    #     return get_most_frequent_words(data_list, amount_to_show)
-    #     # words_counter = Counter(text)
-    #     # data = words_counter.most_common(amount_to_show)
-    #     # del words_counter
-    # elif type(text) == type({}):
-    #     data = []
-    #     for i, word in enumerate(sorted(text, key=text.get, reverse=True)):
-    #         if i > amount_to_show:
-    #             break
-    #         data.append((word, text[word]))
+
     return data
+
 
 def pretty_print(data):
     digits_size = str(len(str(len(data))))
@@ -138,42 +111,13 @@ if __name__ == '__main__':
     else:
         amount = 10
 
-    # start_time = time.time()
-    # line_reader_result = load_data(path, options.rus)
-    # print(u'Файл прочитан:', time.time()-start_time)
-    # line_reader_result = Counter(line_reader_result)
-    # print(u'Слова подсчитаны:', time.time()-start_time)
-    # chunk_reader_result = load_data(path, options.rus, process_big_file=True)
-    # print(u'Файл прочитан:', time.time()-start_time)    
-    # chunk_reader_result = Counter(chunk_reader_result)
-    # print(u'Слова подсчитаны:', time.time()-start_time)
-    # if chunk_reader_result == line_reader_result:
-    #     print(u'Ребята полностью совпали!!!', time.time()-start_time)
-    # elif chunk_reader_result.most_common(100) == line_reader_result.most_common(100):
-    #     print(u'Совпали не полнотью. Но первые 100 идентичны', time.time()-start_time)
-    # else:
-    #     print(u'Line_method', time.time()-start_time)
-    #     pretty_print(line_reader_result.most_common(100))
-    #     print(u'\n\n====\nChunk method', time.time()-start_time)
-    #     pretty_print(chunk_reader_result.most_common(100))
-    #     print(time.time()-start_time)
-    # exit(-1)
-
-    start_time = time.time()
 
     words_in_text = load_data(path, options.rus, options.big)
     print(u'Файл прочитан')
-
-    print('{}'.format(time.time() - start_time))
 
     if words_in_text is None:
         print('Джонни, у нас проблема с файлом. Так дело не пойдёт')
         exit(-1)
 
     counted_data = get_most_frequent_words(words_in_text, amount) 
-
-    print('{}'.format(time.time() - start_time))
-
     pretty_print(counted_data)
-
-
