@@ -84,23 +84,27 @@ def read_file_by_chunk(filepath, chunk_size=2048):
 
 
 def get_most_frequent_words(text, amount_to_show=10):
-    if type(text) == type([]):
-        data_list = {}
-        for word in text:
-            if word in data_list:
-                data_list[word] += 1
-            else:
-                data_list[word] = 1
-        return get_most_frequent_words(data_list, amount_to_show)
-        # words_counter = Counter(text)
-        # data = words_counter.most_common(amount_to_show)
-        # del words_counter
-    elif type(text) == type({}):
-        data = []
-        for i, word in enumerate(sorted(text, key=text.get, reverse=True)):
-            if i > amount_to_show:
-                break
-            data.append((word, text[word]))
+    
+    words_counter = Counter(text)
+    data = words_counter.most_common(amount_to_show)
+    del words_counter
+    # if type(text) == type([]):
+    #     data_list = {}
+    #     for word in text:
+    #         if word in data_list:
+    #             data_list[word] += 1
+    #         else:
+    #             data_list[word] = 1
+    #     return get_most_frequent_words(data_list, amount_to_show)
+    #     # words_counter = Counter(text)
+    #     # data = words_counter.most_common(amount_to_show)
+    #     # del words_counter
+    # elif type(text) == type({}):
+    #     data = []
+    #     for i, word in enumerate(sorted(text, key=text.get, reverse=True)):
+    #         if i > amount_to_show:
+    #             break
+    #         data.append((word, text[word]))
     return data
 
 def pretty_print(data):
