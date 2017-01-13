@@ -14,14 +14,14 @@ def load_data(filepath):
     return open(filepath, encoding='utf-8').readlines()
 
 
-def process_data(data):
+def process_data(data_from_file):
     '''
     Функция обрабатывает текст и формирует список слов
     '''
     list_of_words = []
     reg_exp = re.compile(r'\w+')
 
-    for line in data:
+    for line in data_from_file:
         list_of_words.extend(reg_exp.findall(line.lower()))
     return list_of_words
 
@@ -55,14 +55,14 @@ def main(options):
         print(u'Необходимо указать путь до файла')
         exit(-1)
 
-    data = load_data(path)
+    data_from_file = load_data(path)
     print(u'Файл прочитан')
 
-    if data is None:
+    if data_from_file is None:
         print(u'Джонни, у нас проблема с файлом. Так дело не пойдёт')
         exit(-1)
 
-    words_in_text = process_data(data)
+    words_in_text = process_data(data_from_file)
 
     most_common_words = get_most_frequent_words(words_in_text, options.amount_to_show)
     pretty_print(most_common_words)
