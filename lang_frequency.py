@@ -11,18 +11,15 @@ def load_data(filepath):
     '''
     if not os.path.isfile(filepath):
         return None
-    return open(filepath, encoding='utf-8').readlines()
+    with open(filepath, encoding='utf-8') as file_handle:
+        return file_handle.read()
 
 
 def process_data(data_from_file):
     '''
     Функция обрабатывает текст и формирует список слов
     '''
-    list_of_words = []
-    reg_exp = re.compile(r'\w+')
-
-    for line in data_from_file:
-        list_of_words.extend(reg_exp.findall(line.lower()))
+    list_of_words = re.findall(r'\w+', data_from_file.lower())
     return list_of_words
 
 
@@ -41,11 +38,11 @@ def pretty_print(most_common_words):
     Выводим слова в виде таблички
     '''
     amount_of_words = len(most_common_words)
-    digits_size = int(math.log10(amount_of_words)) + 1  # Получаем количество цифр в числе
-    string_to_show = '{:0' + str(digits_size) + '}' + '| {}| {}'  # Формируем шаблон для вывода на экран
-    max_word_size = max([len(word[0]) for word in most_common_words])  # Определяем длину самого большого слова
+    amount_of_digits_in_number = int(math.log10(amount_of_words)) + 1
+    string_template_for_show = '{:0' + str(amount_of_digits_in_number) + '}' + '| {}| {}'
+    max_word_length = max([len(word[0]) for word in most_common_words])
     for num, word in enumerate(most_common_words):
-        print(string_to_show.format(num+1, word[0].ljust(max_word_size+1), word[1]))
+        print(string_template_for_show.format(num+1, word[0].ljust(max_word_length+1), word[1]))
 
 
 def main(options):
