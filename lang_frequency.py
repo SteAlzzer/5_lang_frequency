@@ -1,9 +1,9 @@
-import math
 import os
 import re
 from collections import Counter
 from optparse import OptionParser
 import prettytable
+
 
 def load_data(filepath):
     '''
@@ -42,28 +42,23 @@ def pretty_print(most_common_words):
     table.align['Слово'] = 'r'
     for num, word in enumerate(most_common_words):
         table.add_row([num+1, word[0], word[1]])
-    # amount_of_words = len(most_common_words)
-    # amount_of_digits_in_number = int(math.log10(amount_of_words)) + 1
-    # string_template_for_show = '{:0' + str(amount_of_digits_in_number) + '}' + '| {}| {}'
-    # max_word_length = max([len(word[0]) for word in most_common_words])
-    # for num, word in enumerate(most_common_words):
-    #     print(string_template_for_show.format(num+1, word[0].ljust(max_word_length+1), word[1]))
     print(table)
+
 
 def main(options):
     if options.path:
         path = options.path
     else:
-        print(u'Необходимо указать путь до файла')
+        print('Необходимо указать путь до файла')
         exit(-1)
 
     data_from_file = load_data(path)
 
     if data_from_file is None:
-        print(u'Джонни, у нас проблема с файлом. Так дело не пойдёт')
+        print('Джонни, у нас проблема с файлом. Так дело не пойдёт')
         exit(-1)
 
-    print(u'Файл прочитан')
+    print('Файл прочитан')
 
     words_in_text = process_data(data_from_file)
 
