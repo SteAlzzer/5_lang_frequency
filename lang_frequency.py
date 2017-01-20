@@ -6,9 +6,6 @@ import prettytable
 
 
 def load_data(filepath):
-    '''
-    Функция загрузки данных из файла
-    '''
     if not os.path.isfile(filepath):
         return None
     with open(filepath, encoding='utf-8') as file_handle:
@@ -16,17 +13,11 @@ def load_data(filepath):
 
 
 def process_data(data_from_file):
-    '''
-    Функция обрабатывает текст и формирует список слов
-    '''
     list_of_words = re.findall(r'\w+', data_from_file.lower())
     return list_of_words
 
 
 def get_most_frequent_words(words, amount_to_show=10):
-    '''
-    Функция возвращает самые частовстречаемые слова в списке
-    '''
     words_counter = Counter(words)
     most_common_words = words_counter.most_common(amount_to_show)
 
@@ -34,14 +25,11 @@ def get_most_frequent_words(words, amount_to_show=10):
 
 
 def pretty_print(most_common_words):
-    '''
-    Выводим слова в виде таблички
-    '''
     table = prettytable.PrettyTable(['#', 'Слово', 'Кол-во'])
     table.align['#'] = 'r'
     table.align['Слово'] = 'r'
-    for num, word in enumerate(most_common_words):
-        table.add_row([num+1, word[0], word[1]])
+    for num, word in enumerate(most_common_words, start=1):
+        table.add_row([num, word[0], word[1]])
     print(table)
 
 
